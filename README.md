@@ -1,83 +1,153 @@
-#  Cybersecurity Portfolio  
-## Investigating Red Stealer — Threat Intelligence & Malware Analysis (SOC Lab)
+# ITECH1502 - Cybersecurity Portfolio Final Project  
+**Student:** Bernie Ybanez  
+**Student ID:** 30405887  
+**Project Title:** Investigating Red Stealer — Threat Intelligence & Malware Analysis (SOC Lab)  
 
 ---
 
-###  Summary  
-This project documents a hands-on investigation into a suspicious executable suspected of communicating with a Command & Control (C2) server. Using CyberDefenders-style threat intelligence tools like VirusTotal and MalwareBazaar, I performed both static and dynamic analysis to uncover Indicators of Compromise (IOCs), identify malware family aliases, and map observed behaviors to MITRE ATT&CK techniques.
+##  Summary
+In this lab, I investigated a suspicious executable as part of a SOC-style threat-intel lab, starting from its SHA256 (`248FCC901AF…68F907B`) and enriching the sample with vendor metadata, sandbox summaries, and network artefacts from tools like **VirusTotal** and **MalwareBazaar**.  
 
-The sample (SHA256: `248FCC901AFF4E4B4C48C91E4D78A939BF681C9A1BC24ADDC3551B32768F907B`) was classified as a trojan/information stealer from the RedLine or RecordStealer family. It appeared under filenames such as `Wextract.EXE`, `malicious.exe`, and `red.exe`. Analysis revealed a first-seen timestamp of `2023-10-06 04:41:50 UTC`, a decoded C2 IP of `77.91.124.55` over port `1971`, and evidence of local data harvesting (`MITRE T1005`). Static inspection showed use of `ADVAPI32.dll` for privilege escalation attempts.
+By combining static and dynamic analysis, I extracted actionable Indicators of Compromise (IOCs), identified malware family aliases, and mapped observed behaviours to **MITRE ATT&CK** techniques.  
 
-The final report includes methodology, key findings, IOC tables, detection rules (YARA/Sigma), and remediation strategies for SOC and Incident Response teams. This exercise reinforced NIST CSF functions—Identify, Detect, Respond—and aligned with unit learning outcomes.
+The sample was classified as a **Trojan / Information Stealer** linked to the **RedLine / RecordStealer** family and was observed under several filenames, including `Wextract.EXE`, `malicious.exe`, and `red.exe`.  
+
+Key findings include:
+- **First-seen timestamp:** 2023-10-06 04:41:50 UTC  
+- **C2 endpoint:** 77.91.124.55:1971  
+- **MITRE Technique:** T1005 – Data from Local System  
+- **Privilege manipulation APIs:** ADVAPI32.dll imports (e.g., `AdjustTokenPrivileges`, `OpenProcessToken`)  
+
+The final deliverable includes:
+- IOC Table  
+- MITRE ATT&CK Mapping  
+- Example YARA and Sigma Rules  
+- Containment and Remediation Recommendations  
+
+This project reinforced **NIST CSF** functions — *Identify, Detect, Respond* — and strengthened my ability to produce operational intelligence for SOC and IR teams.
 
 ---
 
-###  Introduction  
-- **Platform chosen for portfolio**: GitHub  
-- **Portfolio link**: `30405887/cyber-portfolio-Bernie-Ybanez-30405887`  
-- **Hands-on platform used**: CyberDefenders (Lab: Red Stealer)  
-- **Why selected**: Simulates a real-world SOC threat intel workflow—analyzing a suspicious binary/hash, extracting IOCs, identifying C2 infrastructure, and producing operational guidance for IR. Complements course outcomes in incident response, threat intelligence, and forensics.
+##  Introduction
+**Portfolio Link:** `30405887/cyber-portfolio-Bernie-Ybanez-30405887`  
+**Hands-on Platform:** [CyberDefenders – Red Stealer Lab](https://cyberdefenders.org/blueteam-ctf-challenges/red-stealer/)  
+
+**Why Selected:**  
+This lab simulates a real-world SOC threat intelligence workflow analysing a suspicious binary/hash, extracting IOCs, identifying C2 infrastructure, and producing operational guidance for Incident Response. It directly complements learning outcomes in incident response, threat intelligence, and digital forensics.
 
 ---
 
-###  Problem / Challenge  
-A suspicious executable was discovered on an endpoint and suspected to be part of a C2-enabled information-stealer campaign. As a Threat Intelligence analyst in the SOC, my task was to analyze the hash, identify malware family and IOCs, determine C2 endpoints, map behaviors to MITRE ATT&CK, and produce actionable items for SOC and IR teams.
+##  Problem / Challenge
+A suspicious executable was discovered on an endpoint and suspected to be part of a **C2-enabled information-stealer campaign**.  
+
+As a Threat Intelligence Analyst within the SOC, my tasks were to:
+- Analyse the file hash and classify the malware  
+- Identify malware family and IOCs  
+- Determine C2 endpoints and communication behaviour  
+- Map behaviours to MITRE ATT&CK techniques  
+- Produce actionable intelligence for SOC and IR teams  
 
 ---
 
-###  Project Goals  
+##  Project Goals / Objectives
 - Use VirusTotal and MalwareBazaar to classify the sample and gather metadata  
 - Perform safe static analysis (hashing, strings, import table) and review sandbox summaries  
-- Extract IOCs and map behaviors to MITRE ATT&CK  
+- Extract IOCs and map behaviours to MITRE ATT&CK  
 - Propose containment, remediation, and detection rules (YARA/Sigma)  
 - Reflect on lessons learned and professional development  
 
 ---
 
-###  Methodology  
-Each step is documented with reasoning and actions taken:
+## ⚙️ Methodology  
 
-1. **Initial Enrichment**: Queried VirusTotal using SHA256 hash  
-2. **Malware Category**: Classified as Trojan/Stealer based on AV labels and behavior  
-3. **Filename Discovery**: Extracted from metadata and sandbox reports  
-4. **First-Seen Timestamp**: `2023-10-06 04:41:50 UTC`  
-5. **MITRE Mapping**: T1005 (Data from Local System), T1071.001 (Web Protocols)  
-6. **DNS Resolution**: Sample resolved `facebook.com`  
-7. **C2 Details**: IP `77.91.124.55`, Port `1971`, Bot ID `frant`  
-8. **YARA Rule**: `detect_Redline_Stealer` by Varp0s  
-9. **Alias Correlation**: RedLine = RecordStealer (via Malpedia)  
-10. **Privilege Escalation**: Use of `ADVAPI32.dll` for token manipulation  
+### Step 1 – Input & Initial Enrichment  
+Queried **VirusTotal** using the SHA-256 hash to obtain vendor detection labels, metadata, and sandbox behaviour summaries.  
+
+### Step 2 – Determine Malware Category  
+Reviewed AV vendor tags such as *Trojan*, *RedLine*, and *Stealer*. Sandbox confirmed data collection and C2 communication.  
+
+### Step 3 – Identify Filenames  
+Extracted from VirusTotal metadata: `Wextract.EXE`, `malicious.exe`, `red.exe`.  
+
+### Step 4 – Establish First Submission Timestamp  
+First uploaded: **2023-10-06 04:41:50 UTC**  
+
+### Step 5 – Map Behaviour to MITRE ATT&CK  
+Behaviours observed:
+- File and registry access  
+- Browser data scraping  
+- Credential harvesting  
+- Local file collection  
+
+Mapped to:
+- **T1005** – Data from Local System  
+- **T1071.001** – Web Protocols  
+
+### Step 6 – Identify Domain Name Resolution  
+Detected DNS queries to `facebook.com` — likely used to mimic legitimate traffic.  
+
+### Step 7 – Extract C2 IP and Port  
+Decoded C2 endpoint: **77.91.124.55:1971** with **bot ID "frant"**.  
+
+### Step 8 – Locate YARA Rule and Author  
+Found rule: `detect_Redline_Stealer` by **Varp0s** in MalwareBazaar.  
+
+### Step 9 – Correlate Aliases via Malpedia  
+Confirmed **RecordStealer** as alias for **RedLine Stealer**.  
+
+### Step 10 – Determine Imported DLLs and Privilege Escalation APIs  
+Detected `ADVAPI32.dll` functions:
+- `AdjustTokenPrivileges`  
+- `OpenProcessToken`  
+- `LookupPrivilegeValueA`  
+
+Indicates potential privilege escalation attempts.  
 
 ---
 
-###  Results / Outcomes  
-| Key Finding | Details |
-|-------------|---------|
-| Malware Type | Trojan / Info-Stealer (RedLine / RecordStealer) |
-| SHA256 | `248FCC901AFF4E4B4C48C91E4D78A939BF681C9A1BC24ADDC3551B32768F907B` |
-| Filenames | `Wextract.EXE`, `malicious.exe`, `red.exe` |
-| First Seen | `2023-10-06 04:41:50 UTC` |
-| C2 IP/Port | `77.91.124.55:1971` |
-| Bot ID | `frant` |
-| Targeted Browser | Comodo IceDragon |
-| Privilege API | `ADVAPI32.dll` (AdjustTokenPrivileges, OpenProcessToken) |
-| YARA Rule | `detect_Redline_Stealer` by Varp0s |
-| DNS Behavior | Resolved `facebook.com` during execution |
+## 📊 Results / Outcomes  
+
+| **Key Finding** | **Details** |
+|------------------|-------------|
+| **Malware Type** | Trojan / Info-Stealer (RedLine / RecordStealer) |
+| **SHA256** | 248FCC901AFF4E4B4C48C91E4D78A939BF681C9A1BC24ADDC3551B32768F907B |
+| **Filenames** | Wextract.EXE, malicious.exe, red.exe |
+| **First Seen** | 2023-10-06 04:41:50 UTC |
+| **C2 IP/Port** | 77.91.124.55:1971 |
+| **Bot ID** | frant |
+| **Targeted Browser** | Comodo IceDragon |
+| **Privilege API** | ADVAPI32.dll (AdjustTokenPrivileges, OpenProcessToken) |
+| **YARA Rule** | detect_Redline_Stealer by Varp0s |
+| **DNS Behaviour** | Resolved facebook.com during execution |
 
 ---
 
-### Screenshots  
-- **Figure 1**: VirusTotal overview
-- <img width="646" height="380" alt="image" src="https://github.com/user-attachments/assets/e7db48a1-8ad9-4152-92e7-1386e34c0e67" />
-- **Figure 2**: VirusTotal first-seen timestamp
-- <img width="940" height="288" alt="image" src="https://github.com/user-attachments/assets/9c4d7476-b752-4278-af6b-9b8b46f969cc" />
-- **Figure 3**: MalwareBazaar YARA rule and alias mapping
-- <img width="723" height="404" alt="image" src="https://github.com/user-attachments/assets/658aba5f-5b74-43f0-8269-6a1b1b42680a" />
- 
+## 🧠 Screenshots
+<img width="940" height="553" alt="image" src="https://github.com/user-attachments/assets/134a629c-e9ea-4ffe-b36b-af4ceab20426" />
+<img width="940" height="359" alt="image" src="https://github.com/user-attachments/assets/5f532e3d-5f9c-4386-927a-06c3cc21d5bc" />
+<img width="940" height="288" alt="image" src="https://github.com/user-attachments/assets/8c0b33f2-f01c-4744-bb1a-1dd18bb2e0d3" />
+<img width="940" height="811" alt="image" src="https://github.com/user-attachments/assets/c42abb62-33f0-43ec-ab29-fe06fab8ed07" />
+<img width="940" height="607" alt="image" src="https://github.com/user-attachments/assets/ba40e835-ebbb-4231-9488-fac673f4764e" />
+<img width="940" height="493" alt="image" src="https://github.com/user-attachments/assets/c65411a9-02f4-4967-a5db-0df0585b41a5" />
+<img width="940" height="533" alt="image" src="https://github.com/user-attachments/assets/a6d98a62-6eb3-4158-a8e4-3b9601cb9b24" />
+<img width="940" height="525" alt="image" src="https://github.com/user-attachments/assets/b0a31157-e242-4636-b3aa-108d946ffb4b" />
+<img width="940" height="649" alt="image" src="https://github.com/user-attachments/assets/2b771c25-2b64-4dea-886d-fe2f24742612" />
+<img width="816" height="403" alt="image" src="https://github.com/user-attachments/assets/ca7bf032-f6d5-49e6-b12f-5332f0f61529" />
+<img width="763" height="1041" alt="image" src="https://github.com/user-attachments/assets/06fbbca7-12df-46c2-bb96-b34601789e8f" />
 
----
 
-###  Reflection  
-As a cybersecurity student, this lab helped me bridge theory with practice. I gained hands-on experience in threat intelligence workflows, malware triage, and IOC extraction using VirusTotal and MalwareBazaar. Mapping behaviors to MITRE ATT&CK techniques—like T1005 and T1071.001—reinforced my understanding of attacker tactics. Identifying privilege escalation through ADVAPI32.dll deepened my technical insight.
 
-This project strengthened my SOC skills in triage, IOC production, and incident response handoff. I’m now more confident presenting technical evidence and collaborating across teams. If I were to repeat the task, I’d expand into memory forensics, automate threat intel lookups via APIs, script IOC exports, and improve timestamp and chain-of-custody documentation for formal IR workflows.
+
+
+
+
+
+
+
+
+
+
+
+![VirusTotal Detection](images/virustotal-detection.png)
+![First Submission](images/first-seen.png)
+![Malpedia Alias](images/malpedia-alias.png)
