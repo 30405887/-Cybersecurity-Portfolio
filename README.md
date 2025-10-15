@@ -105,7 +105,7 @@ Indicates potential privilege escalation attempts.
 
 ---
 
-## 📊 Results / Outcomes  
+##  Results / Outcomes  
 
 | **Key Finding** | **Details** |
 |------------------|-------------|
@@ -122,7 +122,7 @@ Indicates potential privilege escalation attempts.
 
 ---
 
-## 🧠 Screenshots
+##  Screenshots
 <img width="940" height="553" alt="image" src="https://github.com/user-attachments/assets/134a629c-e9ea-4ffe-b36b-af4ceab20426" />
 <img width="940" height="359" alt="image" src="https://github.com/user-attachments/assets/5f532e3d-5f9c-4386-927a-06c3cc21d5bc" />
 <img width="940" height="288" alt="image" src="https://github.com/user-attachments/assets/8c0b33f2-f01c-4744-bb1a-1dd18bb2e0d3" />
